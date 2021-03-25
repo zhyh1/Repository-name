@@ -1,0 +1,48 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]＃文件：.github / workflows / repo-sync.yml
+名称：A🔄自动同步🔄A
+在：
+  日程：
+    -cron：“ 0 * / 1 * * *”
+  工作流程调度：
+  手表：
+    类型：开始
+  repository_dispatch：
+    类型：repo-sync
+职位：
+  回购同步：
+    环境：
+      PAT：$ {{github.event.client_payload.PAT || secrets.PAT}}＃此处PAT需要申请，教程详见：https：//www.jianshu.com/p/bb82b3ad1d11
+      dst_key：$ {{secrets.GITEE_PRIVATE_KEY}}＃我自己同步到gitee使用，其他人可忽略
+    运行：ubuntu-latest
+    如果：github.event.repository.owner.id == github.event.sender.id
+    脚步：
+      -用途：actions / checkout @ v2
+        和：
+          持久凭证：false
+
+      -名称：开始🔄自动同步🔄
+        用途：repo-sync / github-sync @ v2
+        如果：env.PAT
+        和：
+          source_repo：“ https://github.com/wuzhi01/MyActions.git”
+          source_branch：“主要”
+          destination_branch：“主要”
+          github_token：$ {{github.event.client_payload.PAT || secrets.PAT}}
+      ＃我自己同步到gitee使用，其他人可忽略
+      -名称：同步github-> gitee
+        用途：Yikun / hub-mirror-action @ master
+        如果：env.dst_key
+        和：
+          src：github / wuzhi01
+          dst：gitee / shuye72
+          static_list：“ MyActions”
+          dst_key：$ {{secrets.GITEE_PRIVATE_KEY}}
+          dst_token：$ {{secrets.GITEE_TOKEN}}
